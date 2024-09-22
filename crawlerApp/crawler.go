@@ -53,7 +53,7 @@ func (c *stubCrawler) Start() error {
 			return nil
 		default:
 			c.crawl()
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }
@@ -102,6 +102,7 @@ func (c *stubCrawler) crawl() {
 			URL:         fmt.Sprintf("https://example.com/%d", i),
 			Description: fmt.Sprintf("Description %d", i),
 			Tags:        t,
+			Timestamp:   time.Now(),
 		})
 	}
 

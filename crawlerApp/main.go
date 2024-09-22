@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	kafkaURL = "localhost:29092"
-	topic    = "cpmiEvents"
+	topic = "cpmiEvents"
 )
 
 func main() {
@@ -19,7 +18,7 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 
-	producer := NewKafkaProducer([]string{kafkaURL}, topic, app.eventsChan, &app)
+	producer := NewKafkaProducer([]string{"localhost:29092", "localhost:29093", "localhost:29094"}, topic, app.eventsChan, &app)
 	defer producer.Stop()
 	go producer.Start()
 

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"log/slog"
 	"sync"
-	"time"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -22,6 +21,7 @@ type DefaultProducer struct {
 	app      *App
 	mu       sync.Mutex
 	started  bool
+	total    int
 }
 
 func (p *DefaultProducer) Start() {
@@ -52,13 +52,13 @@ func (p *DefaultProducer) Start() {
 					Value: data,
 				}
 			}
+			p.total += len(messages)
 
-			slog.Info("Writing message", "number", len(messages))
 			err := p.writer.WriteMessages(context.Background(), messages...)
 			if err != nil {
 				slog.Error("Error writing messages", "error", err)
 			}
-			time.Sleep(time.Second * 5)
+			slog.Info("Written messages", "number", len(messages), "total", p.total)
 		}
 	}
 }
