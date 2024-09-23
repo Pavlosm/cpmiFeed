@@ -1,11 +1,11 @@
 package main
 
 import (
-	"cpmiFeed/rawEventModels"
+	"cpmiFeed/common"
 	"sync"
 )
 
 type App struct {
 	wg         *sync.WaitGroup
-	eventsChan chan []rawEventModels.Event
+	eventsChan chan []common.Event
 }

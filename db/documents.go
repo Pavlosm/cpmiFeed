@@ -24,19 +24,24 @@ type User struct {
 }
 
 type UserEventFilters struct {
-	ID     primitive.ObjectID `bson:"_id,omitempty"`
-	UserID primitive.ObjectID `bson:"user_id"`
+	ID      primitive.ObjectID `bson:"_id,omitempty"`
+	Filters []UserEventFilter  `bson:"filters"`
 }
 
-type UserEventsDocument struct {
+type UserEventFilter struct {
+	Tags   []string `bson:"tags"`
+	Tokens []string `bson:"tokens"`
+}
+
+type UserEvents struct {
 	ID     primitive.ObjectID `bson:"_id,omitempty"`
-	UserID primitive.ObjectID `bson:"user_id"`
 	Events []UserEvent        `bson:"events"`
 }
 
 type UserEvent struct {
-	EventID   string      `bson:"event_id"`
-	EventType string      `bson:"event_type"`
-	Timestamp time.Time   `bson:"timestamp"`
-	Data      interface{} `bson:"data"`
+	EventID   string    `bson:"event_id"`
+	EventType string    `bson:"event_type"`
+	Timestamp time.Time `bson:"timestamp"`
+	Viewed    bool      `bson:"viewed"`
+	Deleted   bool      `bson:"deleted"`
 }

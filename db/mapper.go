@@ -1,8 +1,12 @@
 package db
 
-import "cpmiFeed/rawEventModels"
+import (
+	"cpmiFeed/common"
 
-func NewEventDocument(event rawEventModels.Event) Event {
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+func NewEventDocument(event common.Event) Event {
 	return Event{
 		Data:        event.Data,
 		URL:         event.URL,
@@ -12,12 +16,40 @@ func NewEventDocument(event rawEventModels.Event) Event {
 	}
 }
 
-func NewEventFromDocument(document Event) rawEventModels.Event {
-	return rawEventModels.Event{
+func NewEventFromDocument(document Event) common.Event {
+	return common.Event{
+		ID:          document.ID.Hex(),
 		Data:        document.Data,
 		URL:         document.URL,
 		Description: document.Description,
 		Tags:        document.Tags,
 		Timestamp:   document.Timestamp,
+	}
+}
+
+func NewUserDocument(user common.User) (User, error) {
+	id, err := primitive.ObjectIDFromHex(user.ID)
+
+	if err != nil {
+		return User{}, err
+	}
+
+	return User{
+		ID:        id,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Username:  user.Username,
+	}, nil
+}
+
+func NewUserFromDocument(user User) common.User {
+	id := user.ID.Hex()
+	return common.User{
+		ID:        id,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Username:  user.Username,
 	}
 }

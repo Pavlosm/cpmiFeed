@@ -2,14 +2,18 @@ package db
 
 import (
 	"context"
-	"cpmiFeed/rawEventModels"
+	"cpmiFeed/common"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type EventRepository interface {
-	Save(events []rawEventModels.Event) error
+	Save(events []common.Event) error
+	ReadEvents(ctx context.Context, filter interface{}, opts ...*options.FindOptions) ([]common.Event, error)
+	GetById(ctx context.Context, id string) (common.Event, error)
+	Close() error
 }
 
 type MongoEventRepository struct {
@@ -18,24 +22,16 @@ type MongoEventRepository struct {
 	collection string
 }
 
-func NewMongoEventRepository(uri, database string) (*MongoEventRepository, error) {
-
-	client, err := mongo.Connect(
-		context.TODO(),
-		options.Client().ApplyURI(uri))
-
-	if err != nil {
-		return nil, err
-	}
+func NewMongoEventRepository(client *mongo.Client, database string) *MongoEventRepository {
 
 	return &MongoEventRepository{
 		client:     client,
 		database:   database,
 		collection: "Event",
-	}, nil
+	}
 }
 
-func (r *MongoEventRepository) Save(events []rawEventModels.Event) error {
+func (r *MongoEventRepository) Save(events []common.Event) error {
 
 	coll := r.client.Database(r.database).Collection(r.collection)
 
@@ -54,7 +50,7 @@ func (r *MongoEventRepository) Close() error {
 	return r.client.Disconnect(context.TODO())
 }
 
-func (r *MongoEventRepository) ReadEvents(ctx context.Context, filter interface{}, opts ...*options.FindOptions) ([]rawEventModels.Event, error) {
+func (r *MongoEventRepository) ReadEvents(ctx context.Context, filter interface{}, opts ...*options.FindOptions) ([]common.Event, error) {
 
 	coll := r.client.Database(r.database).Collection(r.collection)
 
@@ -69,7 +65,7 @@ func (r *MongoEventRepository) ReadEvents(ctx context.Context, filter interface{
 		return nil, err
 	}
 
-	rawEvents := make([]rawEventModels.Event, len(events))
+	var rawEvents []common.Event
 
 	for _, event := range events {
 		rawEvents = append(rawEvents, NewEventFromDocument(event))
@@ -78,7 +74,18 @@ func (r *MongoEventRepository) ReadEvents(ctx context.Context, filter interface{
 	return rawEvents, nil
 }
 
-func (r *MongoEventRepository) ReadEventsPaginated(ctx context.Context, filter interface{}, page, pageSize int64) ([]rawEventModels.Event, error) {
+func (r *MongoEventRepository) GetById(ctx context.Context, id string) (common.Event, error) {
+	coll := r.client.Database(r.database).Collection(r.collection)
+	filter := bson.M{"_id": id}
+	var event Event
+	err := coll.FindOne(ctx, filter).Decode(&event)
+	if err != nil {
+		return common.Event{}, err
+	}
+	return NewEventFromDocument(event), nil
+}
+
+func (r *MongoEventRepository) ReadEventsPaginated(ctx context.Context, filter interface{}, page, pageSize int64) ([]common.Event, error) {
 	skip := (page - 1) * pageSize
 
 	opts := options.Find().SetSkip(skip).SetLimit(pageSize)

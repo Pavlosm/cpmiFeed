@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cpmiFeed/rawEventModels"
+	"cpmiFeed/common"
 	"fmt"
 	"log/slog"
 	"math/rand"
@@ -80,7 +80,7 @@ func (c *stubCrawler) crawl() {
 
 	r := rand.Intn(10)
 
-	var events []rawEventModels.Event
+	var events []common.Event
 
 	tags := []string{"Education", "Conference", "AI", "C#", "Golang"}
 
@@ -102,7 +102,7 @@ func (c *stubCrawler) crawl() {
 		}
 
 		n := time.Now().UTC()
-		events = append(events, rawEventModels.Event{
+		events = append(events, common.Event{
 			Data:        fmt.Sprintf("Event %d", i),
 			URL:         fmt.Sprintf("https://example.com/%d", i),
 			Description: fmt.Sprintf("Description %d", i),

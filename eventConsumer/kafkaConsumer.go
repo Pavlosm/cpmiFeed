@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"cpmiFeed/rawEventModels"
+	"cpmiFeed/common"
 	"encoding/json"
 	"log/slog"
 	"sync"
@@ -11,7 +11,7 @@ import (
 )
 
 type KafkaConsumer interface {
-	Start(onNewMessage func(events []rawEventModels.Event) error)
+	Start(onNewMessage func(events []common.Event) error)
 	Stop()
 }
 
@@ -34,7 +34,7 @@ func NewDefaultConsumer(brokers []string, topic string, app *App) KafkaConsumer 
 	}
 }
 
-func (c *DefaultConsumer) Start(onNewMessage func(events []rawEventModels.Event) error) {
+func (c *DefaultConsumer) Start(onNewMessage func(events []common.Event) error) {
 	c.mu.Lock()
 	if c.started {
 		c.mu.Unlock()
@@ -58,21 +58,21 @@ func (c *DefaultConsumer) Start(onNewMessage func(events []rawEventModels.Event)
 				continue
 			}
 
-			var event rawEventModels.Event
+			var event common.Event
 			err = json.Unmarshal(m.Value, &event)
 			if err != nil {
 				slog.Error("Error unmarshalling message", "error", err)
 				continue
 			}
 
-			err = onNewMessage([]rawEventModels.Event{event})
+			err = onNewMessage([]common.Event{event})
 			if err != nil {
 				slog.Error("Error processing message", "error", err)
 				continue
 			}
 			c.reader.CommitMessages(context.Background(), m)
 
-			c.app.eventsChan <- []rawEventModels.Event{event}
+			c.app.eventsChan <- []common.Event{event}
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cpmiFeed/rawEventModels"
+	"cpmiFeed/common"
 	"os"
 	"sync"
 )
@@ -13,7 +13,7 @@ const (
 func main() {
 	app := App{
 		wg:         &sync.WaitGroup{},
-		eventsChan: make(chan []rawEventModels.Event, 5000),
+		eventsChan: make(chan []common.Event, 5000),
 	}
 
 	stop := make(chan os.Signal, 1)

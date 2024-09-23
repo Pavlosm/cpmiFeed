@@ -1,8 +1,8 @@
 package main
 
 import (
+	"cpmiFeed/common"
 	"cpmiFeed/db"
-	"cpmiFeed/rawEventModels"
 	"log/slog"
 	"os"
 	"sync"
@@ -11,18 +11,15 @@ import (
 func main() {
 	app := App{
 		wg:         &sync.WaitGroup{},
-		eventsChan: make(chan []rawEventModels.Event),
+		eventsChan: make(chan []common.Event),
 	}
 
 	stop := make(chan os.Signal, 1)
 
-	repo, err := db.NewMongoEventRepository("mongodb://root:example@localhost:27017", "cpmiFeed")
-	if err != nil {
-		os.Exit(1)
-	}
-	defer repo.Close()
+	repos := db.NewRepositories("mongodb://root:example@localhost:27017", "cpmiFeed")
+	defer repos.Close()
 	consumer := NewDefaultConsumer([]string{"localhost:29092", "localhost:29093", "localhost:29094"}, "cpmiEvents", &app)
-	go consumer.Start(repo.Save)
+	go consumer.Start(repos.Event.Save)
 
 	m := 0
 	go func() {
