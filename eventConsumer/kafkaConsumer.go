@@ -65,7 +65,6 @@ func (c *DefaultConsumer) Start(onNewMessage func(events []rawEventModels.Event)
 				continue
 			}
 
-			// todo on commit
 			err = onNewMessage([]rawEventModels.Event{event})
 			if err != nil {
 				slog.Error("Error processing message", "error", err)

@@ -79,30 +79,35 @@ func (c *stubCrawler) crawl() {
 	c.numOfCrawls++
 
 	r := rand.Intn(10)
-	events := make([]rawEventModels.Event, r)
-	t := make([]string, r)
+
+	var events []rawEventModels.Event
+
 	tags := []string{"Education", "Conference", "AI", "C#", "Golang"}
 
 	for i := 0; i < r; i++ {
+		var t []string
+
 		if i%2 == 0 {
 			rt1 := rand.Intn(len(tags))
 			rt2 := rand.Intn(len(tags))
-			t = append(t, tags[rt1], tags[rt2])
+			t = []string{tags[rt1], tags[rt2]}
 		} else if i%3 == 0 {
 			rt1 := rand.Intn(len(tags))
 			rt2 := rand.Intn(len(tags))
 			rt3 := rand.Intn(len(tags))
-			t = append(t, tags[rt1], tags[rt2], tags[rt3])
+			t = []string{tags[rt1], tags[rt2], tags[rt3]}
 		} else {
 			rt := rand.Intn(len(tags))
-			t = append(t, tags[rt])
+			t = []string{tags[rt]}
 		}
+
+		n := time.Now().UTC()
 		events = append(events, rawEventModels.Event{
 			Data:        fmt.Sprintf("Event %d", i),
 			URL:         fmt.Sprintf("https://example.com/%d", i),
 			Description: fmt.Sprintf("Description %d", i),
 			Tags:        t,
-			Timestamp:   time.Now(),
+			Timestamp:   n,
 		})
 	}
 
