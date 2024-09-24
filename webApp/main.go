@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	r := gin.Default()
 
 	// Apply middleware
@@ -19,7 +20,9 @@ func main() {
 		c.String(http.StatusOK, "Hello, Web App!")
 	})
 
-	repos := db.NewRepositories("mongodb://root:example@localhost:27017", "cpmiFeed")
+	repos := db.NewRepositories()
+	defer repos.Close()
+
 	ctr := controllers.NewControllers(repos)
 
 	events := r.Group("/event")

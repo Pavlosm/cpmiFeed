@@ -7,12 +7,12 @@ import (
 )
 
 type Event struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Data        string             `bson:"data"`
-	Description string             `bson:"event_type"`
-	URL         string             `bson:"url"`
-	Tags        []string           `bson:"tags"`
-	Timestamp   time.Time          `bson:"timestamp"`
+	ID          string    `bson:"_id,omitempty"`
+	Data        string    `bson:"data"`
+	Description string    `bson:"event_type"`
+	URL         string    `bson:"url"`
+	Tags        []string  `bson:"tags"`
+	Timestamp   time.Time `bson:"timestamp"`
 }
 
 type User struct {

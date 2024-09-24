@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"cpmiFeed/common"
+	"cpmiFeed/kafkaConfig"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"sync"
 
@@ -23,12 +25,13 @@ type DefaultConsumer struct {
 	started  bool
 }
 
-func NewDefaultConsumer(brokers []string, topic string, app *App) KafkaConsumer {
+func NewDefaultConsumer(cfg *kafkaConfig.Config, app *App) KafkaConsumer {
+
 	return &DefaultConsumer{
 		reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers: brokers,
-			Topic:   topic,
-			GroupID: "cpmiEventsConsumer",
+			Brokers: cfg.Brokers,
+			Topic:   cfg.EventsTopic,
+			GroupID: cfg.ConsumerGroupId,
 		}),
 		app: app,
 	}
@@ -60,6 +63,7 @@ func (c *DefaultConsumer) Start(onNewMessage func(events []common.Event) error) 
 
 			var event common.Event
 			err = json.Unmarshal(m.Value, &event)
+			event.ID = fmt.Sprintf("%d-%d", m.Partition, m.Offset)
 			if err != nil {
 				slog.Error("Error unmarshalling message", "error", err)
 				continue

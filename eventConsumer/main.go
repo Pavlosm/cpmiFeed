@@ -3,6 +3,7 @@ package main
 import (
 	"cpmiFeed/common"
 	"cpmiFeed/db"
+	"cpmiFeed/kafkaConfig"
 	"log/slog"
 	"os"
 	"sync"
@@ -16,9 +17,12 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 
-	repos := db.NewRepositories("mongodb://root:example@localhost:27017", "cpmiFeed")
+	repos := db.NewRepositories()
 	defer repos.Close()
-	consumer := NewDefaultConsumer([]string{"localhost:29092", "localhost:29093", "localhost:29094"}, "cpmiEvents", &app)
+
+	cfg := kafkaConfig.NewConfig()
+	consumer := NewDefaultConsumer(cfg, &app)
+
 	go consumer.Start(repos.Event.Save)
 
 	m := 0

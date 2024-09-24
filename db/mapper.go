@@ -8,6 +8,7 @@ import (
 
 func NewEventDocument(event common.Event) Event {
 	return Event{
+		ID:          event.ID,
 		Data:        event.Data,
 		URL:         event.URL,
 		Description: event.Description,
@@ -18,7 +19,7 @@ func NewEventDocument(event common.Event) Event {
 
 func NewEventFromDocument(document Event) common.Event {
 	return common.Event{
-		ID:          document.ID.Hex(),
+		ID:          document.ID,
 		Data:        document.Data,
 		URL:         document.URL,
 		Description: document.Description,

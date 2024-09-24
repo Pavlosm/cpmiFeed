@@ -2,12 +2,9 @@ package main
 
 import (
 	"cpmiFeed/common"
+	"cpmiFeed/kafkaConfig"
 	"os"
 	"sync"
-)
-
-const (
-	topic = "cpmiEvents"
 )
 
 func main() {
@@ -18,7 +15,8 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 
-	producer := NewKafkaProducer([]string{"localhost:29092", "localhost:29093", "localhost:29094"}, topic, app.eventsChan, &app)
+	cfg := kafkaConfig.NewConfig()
+	producer := NewKafkaProducer(cfg, &app)
 	defer producer.Stop()
 	go producer.Start()
 

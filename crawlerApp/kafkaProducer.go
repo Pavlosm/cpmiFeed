@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"cpmiFeed/common"
+	"cpmiFeed/kafkaConfig"
 	"encoding/json"
 	"log/slog"
 	"sync"
@@ -71,11 +71,11 @@ func (p *DefaultProducer) Stop() {
 	close(p.stopChan)
 }
 
-func NewKafkaProducer(brokers []string, topic string, inputChan <-chan []common.Event, app *App) KafkaProducer {
+func NewKafkaProducer(cfg *kafkaConfig.Config, app *App) KafkaProducer {
 	return &DefaultProducer{
 		writer: kafka.NewWriter(kafka.WriterConfig{
-			Brokers: brokers,
-			Topic:   topic,
+			Brokers: cfg.Brokers,
+			Topic:   cfg.EventsTopic,
 		}),
 		app: app,
 	}
