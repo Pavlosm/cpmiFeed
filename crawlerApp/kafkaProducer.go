@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"cpmiFeed/kafkaConfig"
+	"cpmiFeed/pkg/kafkaConfig"
 	"encoding/json"
 	"log/slog"
 	"sync"

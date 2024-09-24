@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cpmiFeed/common"
-	"cpmiFeed/kafkaConfig"
+	"cpmiFeed/pkg/common"
+	"cpmiFeed/pkg/kafkaConfig"
 	"os"
 	"sync"
 )

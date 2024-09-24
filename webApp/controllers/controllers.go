@@ -1,6 +1,6 @@
 package controllers
 
-import "cpmiFeed/db"
+import "cpmiFeed/pkg/db"
 
 type Controllers struct {
 	Event EventController

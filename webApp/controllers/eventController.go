@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"context"
-	"cpmiFeed/db"
+	"cpmiFeed/pkg/db"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cpmiFeed/common"
+	"cpmiFeed/pkg/common"
 	"fmt"
 	"log/slog"
 	"math/rand"

@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"cpmiFeed/common"
+	"cpmiFeed/pkg/common"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

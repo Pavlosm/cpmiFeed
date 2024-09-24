@@ -1,7 +1,7 @@
 package db
 
 import (
-	"cpmiFeed/common"
+	"cpmiFeed/pkg/common"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

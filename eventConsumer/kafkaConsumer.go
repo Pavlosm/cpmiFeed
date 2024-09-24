@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"cpmiFeed/common"
-	"cpmiFeed/kafkaConfig"
+	"cpmiFeed/pkg/common"
+	"cpmiFeed/pkg/kafkaConfig"
 	"encoding/json"
 	"fmt"
 	"log/slog"

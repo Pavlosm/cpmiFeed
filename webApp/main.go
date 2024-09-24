@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cpmiFeed/db"
+	"cpmiFeed/pkg/db"
 	"cpmiFeed/webApp/controllers"
 	"net/http"
 
