@@ -55,3 +55,33 @@ stop-all:
 
 clean: 
 	@cd bin && rm -f crawlerApp eventConsumer webApp
+
+docker-build-crawler:
+	@echo "Building crawlerApp Docker image..."
+	@docker build -t crawler -f crawler.Dockerfile .
+	@echo "crawlerApp Docker image built successfully."
+
+docker-build-eventConsumer:
+	@echo "Building eventConsumer Docker image..."
+	@docker build -t eventconsumer -f eventConsumer.Dockerfile .
+	@echo "eventConsumer Docker image built successfully."
+
+docker-build-webApp:
+	@echo "Building webApp Docker image..."
+	@docker build -t webapp -f webApp.Dockerfile .
+	@echo "webApp Docker image built successfully."
+
+docker-run-crawler:
+	@echo "Running crawlerApp Docker container..."
+	@docker run -d --name crawler --network=kafka_default crawler 
+	@echo "crawlerApp Docker container running successfully."
+
+docker-run-eventConsumer:
+	@echo "Running eventConsumer Docker container..."
+	@docker run -d --name eventconsumer --network=kafka_default --network=localsetup_default eventconsumer
+	@echo "eventConsumer Docker container running successfully."
+
+docker-run-webApp:
+	@echo "Running webApp Docker container..."
+	@docker run -d --name webapp --network=localsetup_default -p 8095:8095 webapp
+	@echo "webApp Docker container running successfully."
