@@ -4,6 +4,7 @@ import (
 	"cpmiFeed/cmd/webApp/controllers"
 	"cpmiFeed/pkg/db"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,5 +39,9 @@ func main() {
 		user.POST("/:id", ctr.User.UpdateUser)
 	}
 
-	r.Run(":8080")
+	webAppPort := os.Getenv("WEB_APP_PORT")
+	if webAppPort == "" {
+		webAppPort = "8080"
+	}
+	r.Run(":" + webAppPort)
 }
