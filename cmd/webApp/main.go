@@ -1,8 +1,8 @@
 package main
 
 import (
+	"cpmiFeed/cmd/webApp/controllers"
 	"cpmiFeed/pkg/db"
-	"cpmiFeed/webApp/controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
