@@ -54,3 +54,37 @@ func NewUserFromDocument(user User) common.User {
 		Username:  user.Username,
 	}
 }
+func NewFiltersFromDocument(f UserEventFilters) []common.UserEventFilter {
+
+	var filters []common.UserEventFilter
+
+	for _, uf := range f.Filters {
+		filters = append(filters, common.UserEventFilter{
+			Tags:   uf.Tags,
+			Tokens: uf.Tokens,
+		})
+	}
+	return filters
+}
+
+func NewDocumentFromFilters(userId string, filters []common.UserEventFilter) (UserEventFilters, error) {
+	id, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		return UserEventFilters{}, err
+	}
+
+	var uf []UserEventFilter
+
+	for _, f := range filters {
+		uf = append(uf, UserEventFilter{
+			Tags:   f.Tags,
+			Tokens: f.Tokens,
+		})
+	}
+
+	return UserEventFilters{
+		UserID:  id,
+		Filters: uf,
+	}, nil
+}

@@ -7,3 +7,8 @@ type User struct {
 	Email     string `json:"email"`
 	Username  string `json:"username"`
 }
+
+type UserEventFilter struct {
+	Tags   []string `json:"tags"`
+	Tokens []string `json:"tokens"`
+}

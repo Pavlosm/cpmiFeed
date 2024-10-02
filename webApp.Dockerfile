@@ -7,7 +7,7 @@ COPY cmd/webApp/ ./cmd/webApp
 COPY pkg ./pkg
 RUN go mod tidy
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /webApp ./cmd/webApp/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/webApp ./cmd/webApp
 
 ENV MONGO_ADDRESS=mongo:27017
 ENV MONGO_DATABASE=cpmiFeed
@@ -20,4 +20,4 @@ ENV WEB_APP_PORT=8099
 
 EXPOSE 8099
 
-CMD ["/webApp"]
+CMD ["/app/webApp"]

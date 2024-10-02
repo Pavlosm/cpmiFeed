@@ -12,6 +12,7 @@ import (
 type Repositories struct {
 	Event      EventRepository
 	User       UserRepository
+	UserFilter UserFilterRepository
 	UserEvents UserEventsRepository
 }
 
@@ -42,5 +43,6 @@ func NewRepositories() *Repositories {
 		Event:      NewMongoEventRepository(client, d),
 		User:       NewMongoUserRepository(client, d),
 		UserEvents: NewMongoUserEventsRepository(client, d),
+		UserFilter: NewMongoUserFilterRepository(client, d),
 	}
 }

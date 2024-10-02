@@ -24,7 +24,7 @@ type User struct {
 }
 
 type UserEventFilters struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty"`
+	UserID  primitive.ObjectID `bson:"_id,omitempty"`
 	Filters []UserEventFilter  `bson:"filters"`
 }
 
