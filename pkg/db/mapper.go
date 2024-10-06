@@ -74,17 +74,23 @@ func NewDocumentFromFilters(userId string, filters []common.UserEventFilter) (Us
 		return UserEventFilters{}, err
 	}
 
-	var uf []UserEventFilter
-
-	for _, f := range filters {
-		uf = append(uf, UserEventFilter{
-			Tags:   f.Tags,
-			Tokens: f.Tokens,
-		})
-	}
+	uf := NewDocFiltersFromCommonFilters(filters)
 
 	return UserEventFilters{
 		UserID:  id,
 		Filters: uf,
 	}, nil
+}
+
+func NewDocFiltersFromCommonFilters(filters []common.UserEventFilter) []UserEventFilter {
+	var docFilters []UserEventFilter
+
+	for _, f := range filters {
+		docFilters = append(docFilters, UserEventFilter{
+			Tags:   f.Tags,
+			Tokens: f.Tokens,
+		})
+	}
+
+	return docFilters
 }

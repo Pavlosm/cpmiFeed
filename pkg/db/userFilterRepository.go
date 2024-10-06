@@ -69,9 +69,10 @@ func (r *MongoUserFilterRepository) Create(ctx context.Context, userId string, f
 }
 
 func (r *MongoUserFilterRepository) Update(ctx context.Context, userId string, filters []common.UserEventFilter) error {
-	// coll := r.client.Database(r.database).Collection(r.collection)
-	// _, err := coll.UpdateOne(ctx, bson.M{"user_id": userId}, bson.M{"$set": NewDocumentFromFilters(userId, filters)})
-	return mongo.ErrNilCursor
+	coll := r.client.Database(r.database).Collection(r.collection)
+	doc := NewDocFiltersFromCommonFilters(filters)
+	_, err := coll.UpdateOne(ctx, bson.M{"user_id": userId}, bson.M{"$set": bson.M{"filters": doc}})
+	return err
 }
 
 func (r *MongoUserFilterRepository) Delete(ctx context.Context, userId string) error {
