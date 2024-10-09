@@ -12,6 +12,7 @@ import (
 
 type UserEventsRepository interface {
 	UpsertUserEvents(ctx context.Context, userId string, userEvents ...common.Event) error
+	GetUserEvents(ctx context.Context, userId string) ([]common.UserEvent, error)
 	Close() error
 }
 
@@ -73,12 +74,22 @@ func (r *MongoUserEventsRepository) CreateUserEventsWithID(ctx context.Context, 
 	return err
 }
 
-func (r *MongoUserEventsRepository) GetUserEvents(ctx context.Context, userID primitive.ObjectID) (UserEvents, error) {
+func (r *MongoUserEventsRepository) GetUserEvents(ctx context.Context, userId string) ([]common.UserEvent, error) {
 	coll := r.client.Database(r.database).Collection(r.collection)
-	filter := bson.M{"_id": userID}
+	id, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return make([]common.UserEvent, 0), err
+	}
+	filter := bson.M{"_id": id}
 	var userEvents UserEvents
-	err := coll.FindOne(ctx, filter).Decode(&userEvents)
-	return userEvents, err
+	err = coll.FindOne(ctx, filter).Decode(&userEvents)
+	if err != nil {
+		return make([]common.UserEvent, 0), err
+	}
+
+	ev := NewUserEventsFromUserEventsDocument(userEvents)
+
+	return ev, err
 }
 
 func (r *MongoUserEventsRepository) UpdateUserEvents(ctx context.Context, userEvents UserEvents) error {

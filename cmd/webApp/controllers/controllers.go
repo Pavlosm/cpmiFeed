@@ -6,6 +6,7 @@ type Controllers struct {
 	Event       EventController
 	User        UserController
 	UserFilters UserFilterController
+	UserEvents  UserEventsController
 }
 
 func NewControllers(repos *db.Repositories) *Controllers {
@@ -13,5 +14,6 @@ func NewControllers(repos *db.Repositories) *Controllers {
 		Event:       NewEventController(repos),
 		User:        NewUserController(repos),
 		UserFilters: NewUserFilterController(repos),
+		UserEvents:  NewUserEventsController(repos),
 	}
 }

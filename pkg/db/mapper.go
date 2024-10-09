@@ -60,6 +60,20 @@ func NewUserEventDocumentFromUserEvents(events []common.Event) []UserEvent {
 	return ev
 }
 
+func NewUserEventsFromUserEventsDocument(e UserEvents) []common.UserEvent {
+	ev := make([]common.UserEvent, len(e.Events))
+	for _, e := range e.Events {
+		ev = append(ev, common.UserEvent{
+			EventID:     e.EventID,
+			Description: e.Description,
+			Timestamp:   e.Timestamp,
+			Viewed:      e.Viewed,
+			Deleted:     e.Deleted,
+		})
+	}
+	return ev
+}
+
 func NewUserDocument(user common.User) (User, error) {
 	id, err := primitive.ObjectIDFromHex(user.ID)
 
