@@ -1,0 +1,8 @@
+Makefile
+crawler.Dockerfile
+eventConsumer.Dockerfile
+webApp.Dockerfile
+implementation-plan.md
+README.md
+.gitignore
+bin

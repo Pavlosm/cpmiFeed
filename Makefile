@@ -36,6 +36,11 @@ start-webApp:
 	@cd cmd/webApp && go run .
 	@echo "webApp running successfully."
 
+start-testApp:
+	@echo "Starting testApp..."
+	@cd cmd/testApp && go run .
+	@echo "testApp running successfully."
+
 stop-webApp:
 	@echo "Stopping webApp..."
 	@cd bin && pkill -f "webApp"

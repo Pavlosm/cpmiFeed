@@ -21,7 +21,9 @@ ENV MONGO_USERNAME=root
 ENV KAFKA_BROKERS="broker1:9091,broker2:9092,broker3:9093"
 ENV KAFKA_CONSUMER_GROUP_ID=cpmiEventsConsumer
 ENV KAFKA_EVENTS_TOPIC=cpmiEvents
-ENV WEB_APP_PORT=8099
+
+ARG DEFAULT_PORT=8099
+ENV WEB_APP_PORT=$DEFAULT_PORT
 
 COPY --from=build /etc/passwd /etc/passwd
 
@@ -29,6 +31,6 @@ COPY --from=build /app/webApp /webApp
 
 USER nonroot
 
-EXPOSE 8099
+EXPOSE $WEB_APP_PORT
 
 CMD ["/webApp"]
