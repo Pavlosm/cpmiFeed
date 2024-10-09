@@ -45,10 +45,10 @@ func main() {
 			user.POST("/:id/filters", ctr.UserFilters.Update)
 			user.DELETE("/:id/filters", ctr.UserFilters.Delete)
 
-			user.GET("/:id/filters", ctr.Event.GetEvent)
+			user.GET("/:id/events", ctr.UserEvents.GetForUser)
 		}
 
-		api.GET("/events", ctr.UserEvents.GetForUser)
+		api.GET("/filters", ctr.UserFilters.GetAll)
 	}
 
 	webAppPort := os.Getenv("WEB_APP_PORT")
