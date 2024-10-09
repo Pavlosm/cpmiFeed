@@ -35,14 +35,14 @@ type UserEventFilter struct {
 }
 
 type UserEvents struct {
-	ID     primitive.ObjectID `bson:"_id,omitempty"`
+	UserID primitive.ObjectID `bson:"_id,omitempty"`
 	Events []UserEvent        `bson:"events"`
 }
 
 type UserEvent struct {
-	EventID   string    `bson:"event_id"`
-	EventType string    `bson:"event_type"`
-	Timestamp time.Time `bson:"timestamp"`
-	Viewed    bool      `bson:"viewed"`
-	Deleted   bool      `bson:"deleted"`
+	EventID     string    `bson:"event_id"`
+	Description string    `bson:"description"`
+	Timestamp   time.Time `bson:"timestamp"`
+	Viewed      bool      `bson:"viewed"`
+	Deleted     bool      `bson:"deleted"`
 }

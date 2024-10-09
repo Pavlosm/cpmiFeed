@@ -2,14 +2,16 @@ package db
 
 import (
 	"context"
+	"cpmiFeed/pkg/common"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type UserEventsRepository interface {
-	CreateUserEvents(ctx context.Context, userEvents UserEvents) error
+	UpsertUserEvents(ctx context.Context, userId string, userEvents ...common.Event) error
 	Close() error
 }
 
@@ -26,15 +28,47 @@ func NewMongoUserEventsRepository(client *mongo.Client, database string) *MongoU
 		collection: "UserEvents"}
 }
 
-func (r *MongoUserEventsRepository) CreateUserEvents(ctx context.Context, userEvents UserEvents) error {
+func (r *MongoUserEventsRepository) UpsertUserEvents(ctx context.Context, userId string, userEvents ...common.Event) error {
 	coll := r.client.Database(r.database).Collection(r.collection)
-	_, err := coll.InsertOne(ctx, userEvents)
+
+	ue, err := NewDocumentFromUserEvents(userId, userEvents)
+	if err != nil {
+		return err
+	}
+
+	_, err = coll.InsertOne(ctx, ue)
+	if err == nil {
+		return nil
+	}
+
+	v, ok := err.(mongo.WriteException)
+	if !ok {
+		return err
+	}
+	b := true
+	for _, e := range v.WriteErrors {
+		if e.Code == 11000 {
+			b = true
+			break
+		}
+	}
+
+	if !b {
+		return err
+	}
+
+	f := bson.M{"_id": ue.UserID}
+	u := bson.M{"$push": bson.M{"events": bson.M{"$each": ue.Events}}}
+	o := options.Update().SetUpsert(true)
+
+	_, err = coll.UpdateOne(ctx, f, u, o)
+
 	return err
 }
 
 func (r *MongoUserEventsRepository) CreateUserEventsWithID(ctx context.Context, id primitive.ObjectID, userEvents UserEvents) error {
 	coll := r.client.Database(r.database).Collection(r.collection)
-	userEvents.ID = id
+	userEvents.UserID = id
 	_, err := coll.InsertOne(ctx, userEvents)
 	return err
 }
@@ -49,7 +83,7 @@ func (r *MongoUserEventsRepository) GetUserEvents(ctx context.Context, userID pr
 
 func (r *MongoUserEventsRepository) UpdateUserEvents(ctx context.Context, userEvents UserEvents) error {
 	coll := r.client.Database(r.database).Collection(r.collection)
-	_, err := coll.UpdateOne(ctx, bson.M{"_id": userEvents.ID}, bson.M{"$set": userEvents})
+	_, err := coll.UpdateOne(ctx, bson.M{"_id": userEvents.UserID}, bson.M{"$set": userEvents})
 	return err
 }
 
@@ -57,10 +91,9 @@ func (r *MongoUserEventsRepository) UpdateSingleEvent(ctx context.Context, userI
 	coll := r.client.Database(r.database).Collection(r.collection)
 	filter := bson.M{"_id": userID, "events.event_id": event.EventID}
 	update := bson.M{"$set": bson.M{
-		"events.$.event_type": event.EventType,
-		"events.$.timestamp":  event.Timestamp,
-		"events.$.viewed":     event.Viewed,
-		"events.$.deleted":    event.Deleted,
+		"events.$.timestamp": event.Timestamp,
+		"events.$.viewed":    event.Viewed,
+		"events.$.deleted":   event.Deleted,
 	}}
 	_, err := coll.UpdateOne(ctx, filter, update)
 	return err

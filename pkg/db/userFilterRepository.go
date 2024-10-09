@@ -10,7 +10,7 @@ import (
 )
 
 type UserFilterRepository interface {
-	GetAll(ctx context.Context) ([]UserEventFilters, error)
+	GetAll(ctx context.Context) (map[string][]common.UserEventFilter, error)
 	GetForUser(ctx context.Context, userId string) ([]common.UserEventFilter, error)
 	Create(ctx context.Context, userId string, filter []common.UserEventFilter) error
 	Update(ctx context.Context, userId string, filter []common.UserEventFilter) error
@@ -35,7 +35,7 @@ func (r *MongoUserFilterRepository) Close() error {
 	return r.client.Disconnect(context.TODO())
 }
 
-func (r *MongoUserFilterRepository) GetAll(ctx context.Context) ([]UserEventFilters, error) {
+func (r *MongoUserFilterRepository) GetAll(ctx context.Context) (map[string][]common.UserEventFilter, error) {
 	coll := r.client.Database(r.database).Collection(r.collection)
 	cursor, err := coll.Find(ctx, bson.D{})
 	if err != nil {
@@ -46,7 +46,12 @@ func (r *MongoUserFilterRepository) GetAll(ctx context.Context) ([]UserEventFilt
 		return nil, err
 	}
 
-	return filters, nil
+	cFilters := make(map[string][]common.UserEventFilter)
+	for _, f := range filters {
+		cFilters[f.UserID.Hex()] = NewFiltersFromDocument(f)
+	}
+
+	return cFilters, nil
 }
 
 func (r *MongoUserFilterRepository) GetForUser(ctx context.Context, userId string) ([]common.UserEventFilter, error) {

@@ -28,6 +28,38 @@ func NewEventFromDocument(document Event) common.Event {
 	}
 }
 
+func NewDocumentFromUserEvents(userId string, events []common.Event) (UserEvents, error) {
+	id, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		return UserEvents{}, err
+	}
+	ev := make([]UserEvent, len(events))
+	for _, e := range events {
+		ev = append(ev, UserEvent{
+			EventID:     e.ID,
+			Timestamp:   e.Timestamp,
+			Description: e.Description,
+		})
+	}
+	return UserEvents{
+		UserID: id,
+		Events: ev,
+	}, nil
+}
+
+func NewUserEventDocumentFromUserEvents(events []common.Event) []UserEvent {
+	ev := make([]UserEvent, len(events))
+	for _, e := range events {
+		ev = append(ev, UserEvent{
+			EventID:     e.ID,
+			Timestamp:   e.Timestamp,
+			Description: e.Description,
+		})
+	}
+	return ev
+}
+
 func NewUserDocument(user common.User) (User, error) {
 	id, err := primitive.ObjectIDFromHex(user.ID)
 
