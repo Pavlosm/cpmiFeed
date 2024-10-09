@@ -62,7 +62,11 @@ func (r *MongoUserRepository) CreateUser(ctx context.Context, user User) (common
 func (r *MongoUserRepository) GetById(ctx context.Context, id string) (User, error) {
 	coll := r.client.Database(r.database).Collection(r.collection)
 	var user User
-	err := coll.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
+	userIdObj, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return user, err
+	}
+	err = coll.FindOne(ctx, bson.M{"_id": userIdObj}).Decode(&user)
 	return user, err
 }
 

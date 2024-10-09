@@ -5,6 +5,7 @@ import (
 	"cpmiFeed/pkg/common"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -51,7 +52,11 @@ func (r *MongoUserFilterRepository) GetAll(ctx context.Context) ([]UserEventFilt
 func (r *MongoUserFilterRepository) GetForUser(ctx context.Context, userId string) ([]common.UserEventFilter, error) {
 	coll := r.client.Database(r.database).Collection(r.collection)
 	var filter UserEventFilters
-	if err := coll.FindOne(ctx, bson.M{"user_id": userId}).Decode(&filter); err != nil {
+	userIdObj, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, err
+	}
+	if err := coll.FindOne(ctx, bson.M{"_id": userIdObj}).Decode(&filter); err != nil {
 		return make([]common.UserEventFilter, 0), err
 	}
 	f := NewFiltersFromDocument(filter)
@@ -71,12 +76,20 @@ func (r *MongoUserFilterRepository) Create(ctx context.Context, userId string, f
 func (r *MongoUserFilterRepository) Update(ctx context.Context, userId string, filters []common.UserEventFilter) error {
 	coll := r.client.Database(r.database).Collection(r.collection)
 	doc := NewDocFiltersFromCommonFilters(filters)
-	_, err := coll.UpdateOne(ctx, bson.M{"user_id": userId}, bson.M{"$set": bson.M{"filters": doc}})
+	userIdObj, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return err
+	}
+	_, err = coll.UpdateOne(ctx, bson.M{"_id": userIdObj}, bson.M{"$set": bson.M{"filters": doc}})
 	return err
 }
 
 func (r *MongoUserFilterRepository) Delete(ctx context.Context, userId string) error {
 	coll := r.client.Database(r.database).Collection(r.collection)
-	_, err := coll.DeleteOne(ctx, bson.M{"user_id": userId})
+	userIdObj, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return err
+	}
+	_, err = coll.DeleteOne(ctx, bson.M{"_id": userIdObj})
 	return err
 }

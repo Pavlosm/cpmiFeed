@@ -9,6 +9,7 @@ type User struct {
 }
 
 type UserEventFilter struct {
+	Name   string   `json:"name"`
 	Tags   []string `json:"tags"`
 	Tokens []string `json:"tokens"`
 }

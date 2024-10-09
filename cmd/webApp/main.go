@@ -26,20 +26,31 @@ func main() {
 
 	ctr := controllers.NewControllers(repos)
 
-	events := r.Group("/event")
+	api := r.Group("/api")
 	{
-		events.GET("/", ctr.Event.GetEvents)
-	}
+		events := api.Group("/event")
+		{
+			events.GET("/", ctr.Event.GetEvents)
+		}
 
-	user := r.Group("/user")
-	{
-		user.GET("/", ctr.User.GetUsers)
-		user.GET("/:id", ctr.User.GetUser)
-		user.POST("/", ctr.User.CreateUser)
-		user.POST("/:id", ctr.User.UpdateUser)
+		user := api.Group("/user")
+		{
+			user.GET("/", ctr.User.GetUsers)
+			user.GET("/:id", ctr.User.GetUser)
+			user.POST("/", ctr.User.CreateUser)
+			user.POST("/:id", ctr.User.UpdateUser)
+
+			user.GET("/:id/filters", ctr.UserFilters.GetForUser)
+			user.POST("/:id/filters/add", ctr.UserFilters.Create)
+			user.POST("/:id/filters", ctr.UserFilters.Update)
+			user.DELETE("/:id/filters", ctr.UserFilters.Delete)
+		}
+
+		api.GET("/filters", ctr.UserFilters.GetAll)
 	}
 
 	webAppPort := os.Getenv("WEB_APP_PORT")
+
 	if webAppPort == "" {
 		webAppPort = "8080"
 	}

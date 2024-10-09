@@ -29,6 +29,7 @@ type UserEventFilters struct {
 }
 
 type UserEventFilter struct {
+	Name   string   `bson:"name"`
 	Tags   []string `bson:"tags"`
 	Tokens []string `bson:"tokens"`
 }

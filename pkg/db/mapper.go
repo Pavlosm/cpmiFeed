@@ -87,6 +87,7 @@ func NewDocFiltersFromCommonFilters(filters []common.UserEventFilter) []UserEven
 
 	for _, f := range filters {
 		docFilters = append(docFilters, UserEventFilter{
+			Name:   f.Name,
 			Tags:   f.Tags,
 			Tokens: f.Tokens,
 		})
