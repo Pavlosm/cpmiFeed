@@ -27,7 +27,7 @@ func NewMongoUserFilterRepository(client *mongo.Client, database string) UserFil
 	return &MongoUserFilterRepository{
 		client:     client,
 		database:   database,
-		collection: "UserEventFilters",
+		collection: UserEventFiltersCollectionName,
 	}
 }
 

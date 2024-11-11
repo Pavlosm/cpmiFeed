@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 	go func() {
 		for {
 			events := <-app.eventsChan
+			time.Sleep(time.Millisecond * 300)
 			go filterer.HandleSafely(events)
 			m += len(events)
 			slog.Info("Received events", "messageNo", m, "events", events)

@@ -57,8 +57,9 @@ func (p *DefaultProducer) Start() {
 			err := p.writer.WriteMessages(context.Background(), messages...)
 			if err != nil {
 				slog.Error("Error writing messages", "error", err)
+			} else {
+				slog.Info("Written messages", "number", len(messages), "total", p.total)
 			}
-			slog.Info("Written messages", "number", len(messages), "total", p.total)
 		}
 	}
 }
@@ -72,6 +73,22 @@ func (p *DefaultProducer) Stop() {
 }
 
 func NewKafkaProducer(cfg *kafkaConfig.Config, app *App) KafkaProducer {
+	// Connect to Kafka to discover topics
+	conn, err := kafka.Dial("tcp", cfg.Brokers[0])
+	if err != nil {
+		slog.Error("Failed to connect to Kafka", "error", err)
+	}
+	defer conn.Close()
+
+	br, err := conn.Brokers()
+	if err != nil {
+		slog.Error("Failed to get the broker metadata", "error", err)
+	}
+
+	for _, b := range br {
+		slog.Info("Broker", b.Host)
+	}
+
 	return &DefaultProducer{
 		writer: kafka.NewWriter(kafka.WriterConfig{
 			Brokers: cfg.Brokers,

@@ -31,7 +31,7 @@ func NewDefaultConsumer(cfg *kafkaConfig.Config, app *App) KafkaConsumer {
 		reader: kafka.NewReader(kafka.ReaderConfig{
 			Brokers: cfg.Brokers,
 			Topic:   cfg.EventsTopic,
-			GroupID: cfg.ConsumerGroupId,
+			GroupID: "test group",
 		}),
 		app: app,
 	}

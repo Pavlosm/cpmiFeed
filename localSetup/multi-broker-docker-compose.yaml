@@ -11,6 +11,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - cpmi-net
 
   broker1:
     image: confluentinc/cp-kafka:latest
@@ -28,6 +30,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
+    networks:
+      - cpmi-net
+    volumes:
+      - kafka-data:/data/broker1
 
   broker2:
     image: confluentinc/cp-kafka:latest
@@ -45,6 +51,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
+    networks:
+      - cpmi-net
+    volumes:
+      - kafka-data:/data/broker2
 
   broker3:
     image: confluentinc/cp-kafka:latest
@@ -62,6 +72,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
+    networks:
+      - cpmi-net
+    volumes:
+      - kafka-data:/data/broker3
 
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -74,4 +88,15 @@ services:
     environment:
       DYNAMIC_CONFIG_ENABLED: 'true'
       KAFKA_CLUSTERS_0_NAME: kafkacluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'broker1:29092,localhost:29092,localhost:9092,broker1:9092,broker2:29093,localhost:29093,localhost:9093,broker2:9093,broker3:29094,localhost:29094,localhost:9094,broker3:9094'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'broker1:9092,broker2:9093,broker3:9094'
+    networks:
+      - cpmi-net
+
+networks:
+  cpmi-net:
+    name: cpmi-net
+    external: true
+
+volumes:
+  kafka-data:
+    external: false

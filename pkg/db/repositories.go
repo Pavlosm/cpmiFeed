@@ -22,12 +22,10 @@ func (r *Repositories) Close() {
 	r.UserEvents.Close()
 }
 
-func NewRepositories() *Repositories {
-
+func NewClient() *mongo.Client {
 	a := os.Getenv("MONGO_ADDRESS")
 	u := os.Getenv("MONGO_USERNAME")
 	p := os.Getenv("MONGO_PASSWORD")
-	d := os.Getenv("MONGO_DATABASE")
 
 	connectionString := fmt.Sprintf("mongodb://%s:%s@%s", u, p, a)
 
@@ -38,6 +36,19 @@ func NewRepositories() *Repositories {
 	if err != nil {
 		panic(err)
 	}
+
+	return client
+}
+
+func GetDatabase() string {
+	return os.Getenv("MONGO_DATABASE")
+}
+
+func NewRepositories() *Repositories {
+
+	d := GetDatabase()
+
+	client := NewClient()
 
 	return &Repositories{
 		Event:      NewMongoEventRepository(client, d),

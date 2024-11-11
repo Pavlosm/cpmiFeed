@@ -28,7 +28,7 @@ func NewMongoUserRepository(client *mongo.Client, database string) *MongoUserRep
 	return &MongoUserRepository{
 		client:     client,
 		database:   database,
-		collection: "User",
+		collection: UserCollectionName,
 	}
 }
 

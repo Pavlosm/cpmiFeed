@@ -9,7 +9,14 @@ build:
 	@echo "Building webApp..."
 	@cd cmd/webApp && go build -o ../../bin/webApp
 	@echo "webApp built successfully."
+	@cd cmd/kafkaChangeStream && go build -o ../../bin/kafkaChangeStream
+	@echo "kafkaChangeStream built successfully."
 	@echo "All applications built successfully."
+
+build-eventConsumer:
+	@echo "Building eventConsumer..."
+	@cd cmd/eventConsumer && go fmt && go vet && go build -o ../../bin/eventConsumer2
+	@echo "eventConsumer built successfully."
 
 start-crawler:
 	@echo "Starting crawlerApp..."
@@ -36,15 +43,20 @@ start-webApp:
 	@cd cmd/webApp && go run .
 	@echo "webApp running successfully."
 
-start-testApp:
-	@echo "Starting testApp..."
-	@cd cmd/testApp && go run .
-	@echo "testApp running successfully."
-
 stop-webApp:
 	@echo "Stopping webApp..."
 	@cd bin && pkill -f "webApp"
 	@echo "webApp stopped successfully."
+
+start-kafkaChangeStream:
+	@echo "Starting kafkaChangeStream..."
+	@cd cmd/kafkaChangeStream && go run .
+	@echo "kafkaChangeStream running successfully."
+
+stop-kafkaChangeStream:
+	@echo "Stopping kafkaChangeStream..."
+	@cd bin && pkill -f "kafkaChangeStream"
+	@echo "kafkaChangeStream stopped successfully."
 
 stop-all:
 	@echo "Stopping all applications..."
@@ -57,24 +69,31 @@ stop-all:
 	@echo "Stopping webApp..."
 	@cd bin && pkill -f "webApp"
 	@echo "webApp stopped successfully."
+	@cd bin && pkill -f "kafkaChangeStream"
+	@echo "kafkaChangeStream stopped successfully."
 
 clean: 
-	@cd bin && rm -f crawlerApp eventConsumer webApp
+	@cd bin && rm -f crawlerApp eventConsumer webApp kafkaChangeStream
 
 docker-build-crawler:
 	@echo "Building crawlerApp Docker image..."
-	@docker build -t crawler -f crawler.Dockerfile .
+	@docker build -t crawler -f docker/crawler.Dockerfile .
 	@echo "crawlerApp Docker image built successfully."
 
 docker-build-eventConsumer:
 	@echo "Building eventConsumer Docker image..."
-	@docker build -t eventconsumer -f eventConsumer.Dockerfile .
+	@docker build -t eventconsumer -f docker/eventConsumer.Dockerfile .
 	@echo "eventConsumer Docker image built successfully."
 
 docker-build-webApp:
 	@echo "Building webApp Docker image..."
-	@docker build -t webapp -f webApp.Dockerfile .
+	@docker build -t webapp -f docker/webApp.Dockerfile .
 	@echo "webApp Docker image built successfully."
+
+docker-build-kafkaChangeStream:
+	@echo "Building kafkaChangeStream Docker image..."
+	@docker build -t kafkaChangeStream -f docker/kafkaChangeStream.Dockerfile .
+	@echo "kafkaChangeStream Docker image built successfully."
 
 docker-run-crawler:
 	@echo "Running crawlerApp Docker container..."
@@ -90,3 +109,8 @@ docker-run-webApp:
 	@echo "Running webApp Docker container..."
 	@docker run -d --name webapp --network=localsetup_default -p 8095:8095 webapp
 	@echo "webApp Docker container running successfully."
+
+docker-run-kafkaChangeStream:
+	@echo "Running kafkaChangeStream Docker container..."
+	@docker run -d --name kafkaChangeStream --network=localsetup_default kafkaChangeStream
+	@echo "kafkaChangeStream Docker container running successfully."

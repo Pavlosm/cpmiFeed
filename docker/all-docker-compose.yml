@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  crawler:
+    env_file:
+      - ./env/kafka.env
+      - ./env/mongo.env
+  consumer:
+    env_file:
+        - ./env/kafka.env
+        - ./env/mongo.env
+  webApp:
+    env_file:
+      - ./env/kafka.env
+      - ./env/mongo.env

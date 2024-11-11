@@ -26,7 +26,7 @@ func NewMongoUserEventsRepository(client *mongo.Client, database string) *MongoU
 	return &MongoUserEventsRepository{
 		client:     client,
 		database:   database,
-		collection: "UserEvents"}
+		collection: UserEventsCollectionName}
 }
 
 func (r *MongoUserEventsRepository) UpsertUserEvents(ctx context.Context, userId string, userEvents ...common.Event) error {
