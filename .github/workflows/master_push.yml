@@ -39,15 +39,21 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cpmifeedcrawler:1
           file: docker/crawler.Dockerfile
+          provenance: true
+          sbom: true
       - name: Build and push eventConsumer
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cpmifeedconsumer:1
           file: docker/eventConsumer.Dockerfile
+          provenance: true
+          sbom: true
       - name: Build and push webApp
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cpmifeedwebapp:1
           file: docker/webApp.Dockerfile
+          provenance: true
+          sbom: true
