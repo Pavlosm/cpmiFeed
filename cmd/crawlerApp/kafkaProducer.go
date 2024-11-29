@@ -86,7 +86,7 @@ func NewKafkaProducer(cfg *kafkaConfig.Config, app *App) KafkaProducer {
 	}
 
 	for _, b := range br {
-		slog.Info("Broker", b.Host)
+		slog.Info("Broker", "Host", b.Host)
 	}
 
 	return &DefaultProducer{

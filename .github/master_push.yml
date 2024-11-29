@@ -1,0 +1,21 @@
+name: Push to Master
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Go
+          uses: actions/setup-go@v4
+          with:
+            go-version: '1.21'
+        - name: Build applications
+          run: |
+            make build-crawlerApp
+            make build-eventConsumer
+            make build-webApp
