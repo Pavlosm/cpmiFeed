@@ -71,18 +71,13 @@ docker-build-crawlerApp:
 
 docker-build-eventConsumer:
 	@echo Building eventConsumer Docker image...
-	@docker build -t eventconsumer -f docker/eventConsumer.Dockerfile .
+	@docker build -t eventconsumer -f "docker/eventConsumer.Dockerfile" .
 	@echo eventConsumer Docker image built successfully.
 
 docker-build-webApp:
 	@echo Building webApp Docker image...
 	@docker build -t webapp -f docker/webApp.Dockerfile .
 	@echo webApp Docker image built successfully.
-
-docker-build-kafkaChangeStream:
-	@echo Building kafkaChangeStream Docker image...
-	@docker build -t kafkaChangeStream -f docker/kafkaChangeStream.Dockerfile .
-	@echo kafkaChangeStream Docker image built successfully.
 
 # Docker run
 

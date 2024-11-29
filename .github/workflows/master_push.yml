@@ -11,11 +11,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.21'
+          cache-dependency-path: subdir/go.sum
       - name: Build applications
         run: |
           make build-crawlerApp
           make build-eventConsumer
           make build-webApp
+  docker-push:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PWD }}
+      - name: Build and push crawler
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cpmifeedcrawler:1
+          file: docker/crawler.Dockerfile
+      - name: Build and push eventConsumer
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cpmifeedconsumer:1
+          file: docker/eventConsumer.Dockerfile
+      - name: Build and push webApp
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cpmifeedwebapp:1
+          file: docker/webApp.Dockerfile
