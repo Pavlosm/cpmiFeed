@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/segmentio/kafka-go"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 type KafkaProducer interface {
@@ -16,12 +16,13 @@ type KafkaProducer interface {
 }
 
 type DefaultProducer struct {
-	writer   *kafka.Writer
+	writer   *kgo.Client
 	stopChan chan struct{}
 	app      *App
 	mu       sync.Mutex
 	started  bool
 	total    int
+	topic    string
 }
 
 func (p *DefaultProducer) Start() {
@@ -42,23 +43,24 @@ func (p *DefaultProducer) Start() {
 			p.started = false
 			return
 		case e := <-p.app.eventsChan:
-			messages := make([]kafka.Message, len(e))
+			messages := make([]*kgo.Record, len(e))
 			for i, event := range e {
 				data, err := json.Marshal(event)
 				if err != nil {
 					slog.Error("Error marshalling data", "error", err)
 				}
-				messages[i] = kafka.Message{
+				messages[i] = &kgo.Record{
 					Value: data,
+					Topic: p.topic,
 				}
 			}
 			p.total += len(messages)
 
-			err := p.writer.WriteMessages(context.Background(), messages...)
-			if err != nil {
-				slog.Error("Error writing messages", "error", err)
-			} else {
-				slog.Info("Written messages", "number", len(messages), "total", p.total)
+			results := p.writer.ProduceSync(context.Background(), messages...)
+			for _, result := range results {
+				if err := result.Err; err != nil {
+					slog.Error("record had a produce error while synchronously producing", "error", err)
+				}
 			}
 		}
 	}
@@ -73,27 +75,35 @@ func (p *DefaultProducer) Stop() {
 }
 
 func NewKafkaProducer(cfg *kafkaConfig.Config, app *App) KafkaProducer {
+
+	cl, err := kgo.NewClient(
+		kgo.SeedBrokers(cfg.Brokers...),
+		kgo.ConsumeTopics(cfg.EventsTopic),
+	)
+	if err != nil {
+		panic(err)
+	}
+	//defer cl.Close()
+
 	// Connect to Kafka to discover topics
-	conn, err := kafka.Dial("tcp", cfg.Brokers[0])
-	if err != nil {
-		slog.Error("Failed to connect to Kafka", "error", err)
-	}
-	defer conn.Close()
+	// conn, err := kafka.Dial("tcp", cfg.Brokers[0])
+	// if err != nil {
+	// 	slog.Error("Failed to connect to Kafka", "error", err)
+	// }
+	// defer conn.Close()
 
-	br, err := conn.Brokers()
-	if err != nil {
-		slog.Error("Failed to get the broker metadata", "error", err)
-	}
+	// br, err := conn.Brokers()
+	// if err != nil {
+	// 	slog.Error("Failed to get the broker metadata", "error", err)
+	// }
 
-	for _, b := range br {
-		slog.Info("Broker", "Host", b.Host)
-	}
+	// for _, b := range br {
+	// 	slog.Info("Broker", "Host", b.Host)
+	// }
 
 	return &DefaultProducer{
-		writer: kafka.NewWriter(kafka.WriterConfig{
-			Brokers: cfg.Brokers,
-			Topic:   cfg.EventsTopic,
-		}),
-		app: app,
+		writer: cl,
+		app:    app,
+		topic:  cfg.EventsTopic,
 	}
 }
