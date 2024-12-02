@@ -6,15 +6,29 @@ services:
     env_file:
       - ./env/kafka.env
       - ./env/mongo.env
+    networks:
+      - cpmi-net
+
   consumer:
     image: pavlosmi/cpmifeedconsumer:1
     env_file:
         - ./env/kafka.env
         - ./env/mongo.env
+    networks:
+      - cpmi-net
+
   webApp:
     image: pavlosmi/cpmifeedwebapp:1
     ports:
-      - "8080:8080"
+      - "8080:8099"
     env_file:
       - ./env/kafka.env
       - ./env/mongo.env
+      - ./env/web.env
+    networks:
+      - cpmi-net
+
+networks:
+  cpmi-net:
+    name: cpmi-net
+    external: true
