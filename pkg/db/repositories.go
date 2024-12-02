@@ -27,7 +27,12 @@ func NewClient() *mongo.Client {
 	u := os.Getenv("MONGO_USERNAME")
 	p := os.Getenv("MONGO_PASSWORD")
 
-	connectionString := fmt.Sprintf("mongodb://%s:%s@%s", u, p, a)
+	var connectionString string
+	if u != "" && p != "" {
+		connectionString = fmt.Sprintf("mongodb://%s:%s@%s", u, p, a)
+	} else {
+		connectionString = fmt.Sprintf("mongodb://%s", a)
+	}
 
 	client, err := mongo.Connect(
 		context.TODO(),

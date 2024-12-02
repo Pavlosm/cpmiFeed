@@ -35,7 +35,7 @@ func main() {
 	go func() {
 		for {
 			events := <-app.eventsChan
-			time.Sleep(time.Millisecond * 300)
+			time.Sleep(time.Millisecond * 10)
 			go filterer.HandleSafely(events)
 			m += len(events)
 			slog.Info("Received events", "messageNo", m, "events", events)

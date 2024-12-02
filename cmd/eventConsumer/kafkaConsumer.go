@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/segmentio/kafka-go"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 type KafkaConsumer interface {
@@ -18,22 +18,30 @@ type KafkaConsumer interface {
 }
 
 type DefaultConsumer struct {
-	reader   *kafka.Reader
+	reader   *kgo.Client
 	stopChan chan struct{}
 	app      *App
 	mu       sync.Mutex
 	started  bool
+	topic    string
 }
 
 func NewDefaultConsumer(cfg *kafkaConfig.Config, app *App) KafkaConsumer {
 
+	cl, err := kgo.NewClient(
+		kgo.SeedBrokers(cfg.Brokers...),
+		kgo.ConsumeTopics(cfg.EventsTopic),
+		kgo.ConsumerGroup("test group"),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return &DefaultConsumer{
-		reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers: cfg.Brokers,
-			Topic:   cfg.EventsTopic,
-			GroupID: "test group",
-		}),
-		app: app,
+		reader: cl,
+		app:    app,
+		topic:  cfg.EventsTopic,
 	}
 }
 
@@ -55,14 +63,25 @@ func (c *DefaultConsumer) Start(onNewMessage func(events []common.Event) error) 
 			c.started = false
 			return
 		default:
-			m, err := c.reader.FetchMessage(context.Background())
-			if err != nil {
-				slog.Error("Error reading message", "error", err)
+
+			fetches := c.reader.PollRecords(context.Background(), 1)
+			if fetches.IsClientClosed() {
+				return
+			}
+			if errs := fetches.Errors(); len(errs) > 0 {
+				for _, err := range errs {
+					slog.Error("Error fetching messages", "error", err)
+				}
 				continue
 			}
+			records := fetches.Records()
+			if len(records) == 0 {
+				continue
+			}
+			m := records[0]
 
 			var event common.Event
-			err = json.Unmarshal(m.Value, &event)
+			err := json.Unmarshal(m.Value, &event)
 			event.ID = fmt.Sprintf("%d-%d", m.Partition, m.Offset)
 			if err != nil {
 				slog.Error("Error unmarshalling message", "error", err)
@@ -74,7 +93,7 @@ func (c *DefaultConsumer) Start(onNewMessage func(events []common.Event) error) 
 				slog.Error("Error processing message", "error", err)
 				continue
 			}
-			c.reader.CommitMessages(context.Background(), m)
+			c.reader.CommitRecords(context.Background(), fetches.Records()...)
 
 			c.app.eventsChan <- []common.Event{event}
 		}
@@ -86,9 +105,5 @@ func (c *DefaultConsumer) Stop() {
 		return
 	}
 	c.stopChan <- struct{}{}
-	err := c.reader.Close()
-	if err != nil {
-		slog.Error("Error closing reader", "error", err)
-	}
-
+	c.reader.Close()
 }
