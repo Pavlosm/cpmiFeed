@@ -3,6 +3,7 @@ package main
 import (
 	"cpmiFeed/cmd/webApp/controllers"
 	"cpmiFeed/pkg/db"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -52,9 +53,10 @@ func main() {
 	}
 
 	webAppPort := os.Getenv("WEB_APP_PORT")
-
+	slog.Info("Env variable port", "env var port:", webAppPort)
 	if webAppPort == "" {
 		webAppPort = "8080"
 	}
+	slog.Info("Actual port", "actual port:", webAppPort)
 	r.Run(":" + webAppPort)
 }
