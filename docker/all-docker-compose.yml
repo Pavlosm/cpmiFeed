@@ -1,15 +1,20 @@
 version: '3.8'
 
 services:
-  crawler:
+  crawler: 
+    image: pavlosmi/cpmifeedcrawler:1
     env_file:
       - ./env/kafka.env
       - ./env/mongo.env
   consumer:
+    image: pavlosmi/cpmifeedconsumer:1
     env_file:
         - ./env/kafka.env
         - ./env/mongo.env
   webApp:
+    image: pavlosmi/cpmifeedwebapp:1
+    ports:
+      - "8080:8080"
     env_file:
       - ./env/kafka.env
       - ./env/mongo.env
