@@ -76,30 +76,11 @@ func (p *DefaultProducer) Stop() {
 
 func NewKafkaProducer(cfg *kafkaConfig.Config, app *App) KafkaProducer {
 
-	cl, err := kgo.NewClient(
-		kgo.SeedBrokers(cfg.Brokers...),
-		kgo.ConsumeTopics(cfg.EventsTopic),
-	)
+	cl, err := kafkaConfig.NewKafkaProducerClient(cfg)
+
 	if err != nil {
 		panic(err)
 	}
-	//defer cl.Close()
-
-	// Connect to Kafka to discover topics
-	// conn, err := kafka.Dial("tcp", cfg.Brokers[0])
-	// if err != nil {
-	// 	slog.Error("Failed to connect to Kafka", "error", err)
-	// }
-	// defer conn.Close()
-
-	// br, err := conn.Brokers()
-	// if err != nil {
-	// 	slog.Error("Failed to get the broker metadata", "error", err)
-	// }
-
-	// for _, b := range br {
-	// 	slog.Info("Broker", "Host", b.Host)
-	// }
 
 	return &DefaultProducer{
 		writer: cl,

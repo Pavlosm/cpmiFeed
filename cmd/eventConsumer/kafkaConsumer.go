@@ -27,12 +27,7 @@ type DefaultConsumer struct {
 }
 
 func NewDefaultConsumer(cfg *kafkaConfig.Config, app *App) KafkaConsumer {
-
-	cl, err := kgo.NewClient(
-		kgo.SeedBrokers(cfg.Brokers...),
-		kgo.ConsumeTopics(cfg.EventsTopic),
-		kgo.ConsumerGroup("test group"),
-	)
+	cl, err := kafkaConfig.NewKafkaConsumerClient(cfg)
 
 	if err != nil {
 		panic(err)
