@@ -2,7 +2,7 @@ package main
 
 import (
 	"cpmiFeed/pkg/common"
-	"cpmiFeed/pkg/kafkaConfig"
+	"cpmiFeed/pkg/kafka"
 	"os"
 	"sync"
 )
@@ -15,7 +15,7 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 
-	cfg := kafkaConfig.NewConfig()
+	cfg := kafka.NewConfig()
 	producer := NewKafkaProducer(cfg, &app)
 	defer producer.Stop()
 	go producer.Start()

@@ -3,7 +3,7 @@ package main
 import (
 	"cpmiFeed/pkg/common"
 	"cpmiFeed/pkg/db"
-	"cpmiFeed/pkg/kafkaConfig"
+	"cpmiFeed/pkg/kafka"
 	"log/slog"
 	"os"
 	"sync"
@@ -21,7 +21,7 @@ func main() {
 	repos := db.NewRepositories()
 	defer repos.Close()
 
-	cfg := kafkaConfig.NewConfig()
+	cfg := kafka.NewConfig()
 	consumer := NewDefaultConsumer(cfg, &app)
 
 	go consumer.Start(repos.Event.Save)

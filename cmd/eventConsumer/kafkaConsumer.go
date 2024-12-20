@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"cpmiFeed/pkg/common"
-	"cpmiFeed/pkg/kafkaConfig"
+	"cpmiFeed/pkg/kafka"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -26,8 +26,8 @@ type DefaultConsumer struct {
 	topic    string
 }
 
-func NewDefaultConsumer(cfg *kafkaConfig.Config, app *App) KafkaConsumer {
-	cl, err := kafkaConfig.NewKafkaConsumerClient(cfg)
+func NewDefaultConsumer(cfg *kafka.Config, app *App) KafkaConsumer {
+	cl, err := kafka.NewKafkaConsumerClient(cfg)
 
 	if err != nil {
 		panic(err)

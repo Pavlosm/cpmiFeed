@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"cpmiFeed/pkg/kafkaConfig"
+	"cpmiFeed/pkg/kafka"
 	"encoding/json"
 	"log/slog"
 	"sync"
@@ -74,9 +74,9 @@ func (p *DefaultProducer) Stop() {
 	close(p.stopChan)
 }
 
-func NewKafkaProducer(cfg *kafkaConfig.Config, app *App) KafkaProducer {
+func NewKafkaProducer(cfg *kafka.Config, app *App) KafkaProducer {
 
-	cl, err := kafkaConfig.NewKafkaProducerClient(cfg)
+	cl, err := kafka.NewKafkaProducerClient(cfg)
 
 	if err != nil {
 		panic(err)
