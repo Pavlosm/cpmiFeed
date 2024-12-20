@@ -1,13 +1,10 @@
 {
-    "sqltools.connections": [
-        {
-            "server": "localhost",
-            "port": 9042,
-            "previewLimit": 50,
-            "driver": "Cassandra",
-            "password": "admin",
-            "username": "admin",
-            "name": "cassandra_docker"
-        }
+    "cSpell.words": [
+        "eventconsumer",
+        "localsetup",
+        "pkill",
+        "sasl",
+        "twmb",
+        "unmarshalling"
     ]
 }
